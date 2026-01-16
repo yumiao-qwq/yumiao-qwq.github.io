@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Blog</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f0f8ff; /* 默认淡蓝 */
+      color: #333;
+      position: relative;
+    }
+
+    /* 齿轮特效容器 */
+    .gear-effect-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .gear-effect {
+      position: absolute;
+      font-size: 24px;
+      font-weight: bold;
+      transform-origin: center;
+      animation: gearSpinFade 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes gearSpinFade {
+      from {
+        opacity: 1;
+        transform: scale(0) rotate(0deg);
+      }
+      to {
+        opacity: 0;
+        transform: scale(1.5) rotate(720deg);
+      }
+    }
+
+    /* 布局 */
+    .layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    @media (min-aspect-ratio: 1/1) and (min-width: 768px) {
+      .layout {
+        flex-direction: row;
+        overflow: hidden;
+      }
+      .left-panel, .right-panel {
+        height: 100vh;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .left-panel { width: 40%; border-right: 1px solid #e0e0e0; }
+      .right-panel { width: 60%; padding-left: 30px; }
+    }
+
+    .panel { padding: 20px; }
+
+    h1 { font-size: 2rem; margin-bottom: 16px; color: #2c3e50; }
+    p { line-height: 1.6; margin-bottom: 16px; color: #555; }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #d0e8ff;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #88c0ff;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e6f2ff;
+      color: #4a90e2;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin: 4px;
+      font-size: 0.9rem;
+    }
+
+    .tags { margin: 16px 0; }
+
+    .btn-placeholder {
+      width: 100%;
+      height: 44px;
+      background: #e0f0ff;
+      border-radius: 12px;
+      margin: 10px 0;
+      opacity: 0.7;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      margin: 24px 0 12px;
+      color: #2c3e50;
+    }
+
+    /* 设置按钮 */
+    .settings-toggle {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: #a0d0ff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      color: #2c3e50;
+      font-weight: bold;
+    }
+
+    /* 设置菜单 */
+    .settings-menu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 280px;
+      height: 100vh;
+      background: white;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      z-index: 2000;
+      transition: right 0.3s ease;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .settings-menu.open {
+      right: 0;
+    }
+
+    .settings-menu h3 {
+      margin-bottom: 16px;
+      color: #2c3e50;
+    }
+
+    .setting-section {
+      margin-bottom: 20px;
+    }
+
+    .setting-section h4 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #4a90e2;
+    }
+
+    .setting-option {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 4px 0;
+      transition: background 0.2s;
+    }
+
+    .setting-option:hover {
+      background: #f0f8ff;
+    }
+
+    .bg-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      margin-right: 8px;
+      display: inline-block;
+      vertical-align: middle;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 1500;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .avatar { width: 120px; height: 120px; border-radius: 50%; overflow: hidden; /* 防止图片溢出圆形 */ margin: 0 auto 20px; } 
+    .avatar img { width: 100%; height: 100%; object-fit: cover; /* 保持比例并填满 */ }
+  </style>
+</head>
+<body>
+
+  <!-- 齿轮特效容器 -->
+  <div class="gear-effect-container" id="gearContainer"></div>
+
+  <!-- 设置按钮 -->
+  <div class="settings-toggle" id="settingsToggle">⇔</div>
+
+  <!-- 菜单遮罩 -->
+  <div class="overlay" id="menuOverlay"></div>
+
+  <!-- 设置菜单 -->
+  <div class="settings-menu" id="settingsMenu">
+    <h3>⚙️ 设置</h3>
+
+    <div class="setting-section">
+      <h4>🎨 纯色背景</h4>
+      <div class="setting-option" data-bg="default">默认淡蓝</div>
+      <div class="setting-option" data-bg="lightblue">浅蓝色</div>
+      <div class="setting-option" data-bg="white">纯白</div>
+      <div class="setting-option" data-bg="dark">深灰</div>
+    </div>
+
+    <div class="setting-section">
+      <h4>🖼️ 图片背景</h4>
+      <div id="imageBgOptions"></div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="layout">
+    <div class="left-panel panel">
+      <div class="avatar">
+        <img src="important-img/avatar">
+      </div>
+      <h1>Hello!</h1>
+      <p>欢迎来到我的小站～这里记录一些想法、项目和日常。</p>
+      <div class="tags">
+        <span class="tag">前端</span>
+        <span class="tag">异星来客</span>
+        <span class="tag">学生</span>
+        <span class="tag">猫娘</span>
+      </div>
+      <div class="btn-placeholder"></div>
+      <div class="btn-placeholder"></div>
+    </div>
+
+    <div class="right-panel panel">
+      <h2 class="section-title">最近文章</h2>
+      <div class="card"><h3>关于宇宙的三个猜想</h3><p>高级文明是否真的存在？</p><div class="btn-placeholder"></div></div>
+      <div class="card"><h3>用HTML写一个可爱的博客</h3><p>响应式、双栏滚动、淡蓝配色。</p><div class="btn-placeholder"></div></div>
+      <div class="card"><h3>星球与火箭壁纸设计</h3><p>三颗行星环绕恒星，中间那颗最亮。</p><div class="btn-placeholder"></div></div>
+      <div class="card"><h3>今日份的猫</h3><p>它又在我的键盘上睡觉了……</p><div class="btn-placeholder"></div></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 判断背景明暗，返回齿轮颜色 =====
+    function getGearColor() {
+      const bg = window.getComputedStyle(document.body).backgroundColor;
+      // 解析 rgb(r, g, b)
+      const match = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) return '#2c3e50';
+      const r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
+      // 计算亮度（YIQ 公式简化）
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 160 ? '#2c3e50' : '#ffffff'; // 浅背景用深色，深背景用白色
+    }
+
+    // ===== 点击生成 ⚙ 特效 =====
+    document.addEventListener('click', function(e) {
+      const gear = document.createElement('div');
+      gear.className = 'gear-effect';
+      gear.textContent = '⚙';
+      gear.style.color = getGearColor();
+      gear.style.left = (e.clientX - 12) + 'px';
+      gear.style.top = (e.clientY - 12) + 'px';
+      document.getElementById('gearContainer').appendChild(gear);
+
+      // 动画结束后移除
+      setTimeout(() => {
+        gear.remove();
+      }, 1000);
+    });
+
+    // ===== 菜单控制 =====
+    const toggleBtn = document.getElementById('settingsToggle');
+    const menu = document.getElementById('settingsMenu');
+    const overlay = document.getElementById('menuOverlay');
+
+    toggleBtn.addEventListener('click', () => {
+      menu.classList.add('open');
+      overlay.classList.add('show');
+    });
+
+    overlay.addEventListener('click', () => {
+      menu.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+
+    // ===== 图片背景列表（JavaScript 管理）=====
+    const imageBackgrounds = [
+      { name: '星空', path: 'https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' },
+      { name: '森林', path: 'https://images.unsplash.com/photo-1543512214-3070928057d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' },
+      { name: '城市夜景', path: 'https://images.unsplash.com/photo-1506744038136-44e348851971?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' },
+      { name: '海洋', path: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80' },
+    ];
+
+    const imageBgOptions = document.getElementById('imageBgOptions');
+    imageBackgrounds.forEach(img => {
+      const option = document.createElement('div');
+      option.className = 'setting-option';
+      option.innerHTML = `<span class="bg-preview" style="background-image: url(${img.path});"></span>${img.name}`;
+      option.addEventListener('click', () => {
+        document.body.style.background = `url(${img.path}) no-repeat center center fixed`;
+        document.body.style.backgroundSize = 'cover';
+        menu.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+      imageBgOptions.appendChild(option);
+    });
+
+    // ===== 纯色背景 =====
+    const bgMap = {
+      default: '#f0f8ff',
+      lightblue: '#e6f2ff',
+      white: '#ffffff',
+      dark: '#2c3e50'
+    };
+
+    document.querySelectorAll('.setting-option[data-bg]').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const key = opt.getAttribute('data-bg');
+        document.body.style.background = bgMap[key] || '#f0f8ff';
+        menu.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+    });
+  </script>
+</body>
+</html>
