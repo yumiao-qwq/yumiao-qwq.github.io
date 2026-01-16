@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Blog</title>
   <link rel="icon" type="image/png" href="important-img/icon.png">
-  <link rel="stylesheet" href="style.css"> <!-- 引入外部 CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -94,8 +94,8 @@
             <h3>${article.title}</h3>
             <p>${article.summary}</p>
           </a>
-          <div class="article-url">${article.url}</div>
-          <div class="btn-placeholder"></div>
+          <!-- 替换 .btn-placeholder 内容为链接 -->
+          <div class="btn-placeholder link-in-box">${article.url}</div>
         </div>
       `).join('');
     }
