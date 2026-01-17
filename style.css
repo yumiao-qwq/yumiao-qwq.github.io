@@ -247,10 +247,6 @@ p { line-height: 1.6; margin-bottom: 16px; color: #555; }
   margin: 0 auto 20px; 
 } 
 
-.avatar img { 
-  width: 100%; 
-  height: 100%; 
-  object-fit: cover; 
-}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; /* 👈 关键：消除底部空白 */ }
 
 .btn-placeholder a { color: #4a90e2; /* 淡蓝色 */ text-decoration: none; /* 去掉下划线 */ font-weight: normal; /* 防止继承加粗 */ font-style: normal; /* 防止斜体 */ display: block; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
