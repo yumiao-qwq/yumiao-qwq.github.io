@@ -75,17 +75,16 @@
       { key: 'konami', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
     ];
 
-    // ===== （可选）从 JSON 文件加载彩蛋（取消注释即可启用）=====
-    // async function loadEasterEggsFromJSON() {
-    //   try {
-    //     const res = await fetch('easter-eggs.json');
-    //     if (res.ok) {
-    //       window.easterEggs = await res.json();
-    //     }
-    //   } catch (e) {
-    //     console.warn('Failed to load easter-eggs.json, using built-in list.');
-    //   }
-    // }
+    async function loadEasterEggsFromJSON() {
+    try {
+    const res = await fetch('easter-eggs.json');
+    if (res.ok) {
+    window.easterEggs = await res.json();
+    }
+    } catch (e) {
+    console.warn('Failed to load easter-eggs.json, using built-in list.');
+    }
+    }
 
     // ===== 获取 URL 参数中的 file =====
     function getUrlParam(name) {
