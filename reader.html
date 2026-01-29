@@ -7,6 +7,47 @@
   <link rel="icon" type="image/png" href="important-img/icon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="reader.css">
+
+  <!-- 内联输入框样式 -->
+  <style>
+    /* 阅读器头部：标题 + 输入框 */
+    .reader-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .file-input-form {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .file-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #a0d0ff;
+      border-radius: 12px;
+      background: #f0f8ff;
+      font-size: 0.95rem;
+      color: #2c3e50;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .file-input:focus {
+      border-color: #4a90e2;
+    }
+
+    /* 小屏下堆叠显示 */
+    @media (max-width: 768px) {
+      .reader-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -47,7 +88,18 @@
     </div>
 
     <div class="right-panel panel reader-panel">
-      <h2 class="section-title">📖 阅读器</h2>
+      <!-- 标题 + 输入框 -->
+      <div class="reader-header">
+        <h2 class="section-title">📖 阅读器</h2>
+        <form id="file-form" class="file-input-form">
+          <input
+            type="text"
+            id="file-input"
+            placeholder="输入文件路径，如 story.txt"
+            class="file-input"
+          />
+        </form>
+      </div>
       <div id="reader-content" class="reader-content">
         <p>正在加载……</p>
       </div>
@@ -55,15 +107,13 @@
   </div>
 
   <script>
-    // ===== 彩蛋列表（直接内嵌）=====
+    // ===== 彩蛋列表（内嵌）=====
     const easterEggs = [
       { key: 'secret', url: 'https://yumiao-awa.github.io/Client/book/yumiao' },
       { key: 'neko', url: 'img/neko.png' },
       { key: 'github', url: 'https://github.com/yumiao-awa' },
       { key: 'blog', url: 'index.html' },
-      { key:"何意味",url:"reader?file=txt/hyw.txt"},
-      { key:"code",url:"code"},
-      { key:"源代码",url:"code"}
+      { key: 'konami', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
     ];
 
     // ===== 获取 URL 参数 =====
@@ -72,24 +122,21 @@
       return urlParams.get(name);
     }
 
-    // ===== 加载内容（文本或彩蛋）=====
+    // ===== 加载内容 =====
     async function loadContent(filename) {
       const contentEl = document.getElementById('reader-content');
-
       if (!filename) {
         contentEl.innerHTML = '<p>❌ 未指定文件。请在 URL 中添加 ?file=xxx.txt</p>';
         return;
       }
 
-      // 检查是否为彩蛋
       const egg = easterEggs.find(item => item.key === filename);
       if (egg && egg.url) {
-        window.open(egg.url);
+        window.open(egg.url, '_blank');
         contentEl.innerHTML = `<p>✨ 彩蛋已触发！正在跳转……</p>`;
         return;
       }
 
-      // 否则当作普通文本文件加载
       try {
         const response = await fetch(filename);
         if (!response.ok) throw new Error('文件未找到');
@@ -104,7 +151,30 @@
       }
     }
 
-    // ===== 齿轮点击特效 =====
+    // ===== 设置输入框行为 =====
+    function setupFileInput() {
+      const form = document.getElementById('file-form');
+      const input = document.getElementById('file-input');
+      if (!form || !input) return;
+
+      // 从 URL 自动填充输入框（可选）
+      const currentFile = getUrlParam('file');
+      if (currentFile) {
+        input.value = currentFile;
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const filename = input.value.trim();
+        if (filename) {
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('file', filename);
+          window.location.href = newUrl.toString();
+        }
+      });
+    }
+
+    // ===== 齿轮特效 =====
     function getGearColor() {
       const bg = window.getComputedStyle(document.body).backgroundColor;
       const match = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -205,9 +275,10 @@
     // ===== 初始化 =====
     document.addEventListener('DOMContentLoaded', () => {
       const file = getUrlParam('file');
-      loadContent(file);       // 立即加载，不等待任何异步操作
+      loadContent(file);
       bindMenuEvents();
       initBackground();
+      setupFileInput(); // 启用输入框
     });
   </script>
 </body>
