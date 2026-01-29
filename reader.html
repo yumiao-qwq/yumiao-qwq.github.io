@@ -72,6 +72,24 @@
       return urlParams.get(name);
     }
 
+    async function loadTextFile(filename) {
+  const contentEl = document.getElementById('reader-content');
+
+  if (filename === 'secret') {
+    window.open('./secret.html', '_blank');
+    return;
+  }
+
+  if (filename === 'neko') {
+    window.open('img/neko.png', '_blank');
+    return;
+  }
+
+  if (filename === 'github') {
+    window.open('https://github.com/yumiao-awa', '_blank');
+    return;
+  }
+
     // ===== 加载 TXT 文件 =====
     async function loadTextFile(filename) {
       const contentEl = document.getElementById('reader-content');
