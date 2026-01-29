@@ -16,7 +16,7 @@
   <div class="gear-effect-container" id="gearContainer"></div>
 
   <!-- 设置按钮 -->
-  <div class="settings-toggle" id="settingsToggle">⇔</div>
+  <div class="settings-toggle" id="settingsToggle">❖</div>
 
   <!-- 菜单遮罩 -->
   <div class="overlay" id="menuOverlay"></div>
@@ -66,43 +66,55 @@
   </div>
 
   <script>
+    // ===== 彩蛋列表（关键词 → 链接）=====
+    const easterEggs = [
+      { key: 'secret', url: 'https://yumiao-awa.github.io/Client/book/yumiao' },
+      { key: 'neko', url: 'img/neko.png' },
+      { key: 'github', url: 'https://github.com/yumiao-awa' },
+      { key: 'blog', url: 'index.html' },
+      { key: 'konami', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
+    ];
+
+    // ===== （可选）从 JSON 文件加载彩蛋（取消注释即可启用）=====
+    // async function loadEasterEggsFromJSON() {
+    //   try {
+    //     const res = await fetch('easter-eggs.json');
+    //     if (res.ok) {
+    //       window.easterEggs = await res.json();
+    //     }
+    //   } catch (e) {
+    //     console.warn('Failed to load easter-eggs.json, using built-in list.');
+    //   }
+    // }
+
     // ===== 获取 URL 参数中的 file =====
     function getUrlParam(name) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(name);
     }
 
-    async function loadTextFile(filename) {
-  const contentEl = document.getElementById('reader-content');
-
-  if (filename === 'secret') {
-    window.open('./secret.html', '_blank');
-    return;
-  }
-
-  if (filename === 'neko') {
-    window.open('img/neko.png', '_blank');
-    return;
-  }
-
-  if (filename === 'github') {
-    window.open('https://github.com/yumiao-awa', '_blank');
-    return;
-  }
-
-    // ===== 加载 TXT 文件 =====
-    async function loadTextFile(filename) {
+    // ===== 加载文件或触发彩蛋 =====
+    async function loadContent(filename) {
       const contentEl = document.getElementById('reader-content');
+
       if (!filename) {
         contentEl.innerHTML = '<p>❌ 未指定文件。请在 URL 中添加 ?file=xxx.txt</p>';
         return;
       }
 
+      // 🔍 检查是否匹配彩蛋
+      const egg = easterEggs.find(item => item.key === filename);
+      if (egg) {
+        window.open(egg.url, '_blank'); // 新标签页打开
+        contentEl.innerHTML = `<p>✨ 彩蛋已触发！正在跳转……</p>`;
+        return;
+      }
+
+      // 📄 正常加载文本文件
       try {
         const response = await fetch(filename);
         if (!response.ok) throw new Error('文件未找到');
         const text = await response.text();
-        // 转义 HTML 特殊字符，防止 XSS
         const safeText = text
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -134,7 +146,7 @@
       setTimeout(() => gear.remove(), 1000);
     });
 
-    // ===== 菜单 & 背景设置（使用独立 localStorage key 避免冲突）=====
+    // ===== 菜单 & 背景设置 =====
     const toggleBtn = document.getElementById('settingsToggle');
     const menu = document.getElementById('settingsMenu');
     const overlay = document.getElementById('menuOverlay');
@@ -214,10 +226,13 @@
 
     // ===== 初始化 =====
     document.addEventListener('DOMContentLoaded', () => {
-      const file = getUrlParam('file');
-      loadTextFile(file);
-      bindMenuEvents();
-      initBackground();
+      // 如果要从 JSON 加载彩蛋，取消下面两行注释：
+      // loadEasterEggsFromJSON().then(() => {
+        const file = getUrlParam('file');
+        loadContent(file);
+        bindMenuEvents();
+        initBackground();
+      // });
     });
   </script>
 </body>
