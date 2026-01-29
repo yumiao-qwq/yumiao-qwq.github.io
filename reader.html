@@ -225,14 +225,13 @@
     }
 
     // ===== 初始化 =====
-    document.addEventListener('DOMContentLoaded', () => {
-      // 如果要从 JSON 加载彩蛋，取消下面两行注释：
-      // loadEasterEggsFromJSON().then(() => {
+    document.addEventListener('DOMContentLoaded', () => [
+      loadEasterEggsFromJSON().then(() => {
         const file = getUrlParam('file');
         loadContent(file);
         bindMenuEvents();
         initBackground();
-      // });
+       });
     });
   </script>
 </body>
